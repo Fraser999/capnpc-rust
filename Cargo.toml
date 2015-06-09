@@ -1,12 +1,12 @@
 [package]
 
 name = "capnpc"
-version = "0.2.2"
+version = "0.2.3"
 authors = [ "David Renshaw <david@sandstorm.io>" ]
 license = "MIT"
 description = "Cap'n Proto schema compiler plugin"
 repository = "https://github.com/dwrensha/capnpc-rust"
-documentation = "http://docs.capnproto-rust.org"
+documentation = "http://docs.capnproto-rust.org/capnpc"
 
 readme = "README.md"
 
@@ -25,4 +25,4 @@ path = "src/main.rs"
 
 
 [dependencies]
-capnp = "0.2.2"
+capnp = "0.2.4"

@@ -27,15 +27,13 @@
 //!
 //! ```ignore
 //!   [build-dependencies]
-//!   capnpc = "0.1.5"
+//!   capnpc = "*"
 //! ```
 //!
 //! In your build.rs, call
 //!
 //! ```ignore
-//! ::capnpc::compile(Path::new("schema"),
-//!                   &[Path::new("schema/foo.capnp"),
-//!                     Path::new("schema/bar.capnp")]);
+//! ::capnpc::compile("schema", &["schema/foo.capnp", "schema/bar.capnp"]);
 //! ```
 //!
 //! This will be equivalent to executing the shell command
@@ -54,26 +52,17 @@ pub mod schema_capnp;
 pub mod codegen;
 pub mod schema;
 
-pub fn compile(prefix : &::std::path::Path, files : &[&::std::path::Path]) -> ::capnp::Result<()> {
+use std::path::Path;
 
-    // Find the absolute path of `cat`.
-    //
-    // TODO: Once a released version of `capnp compile` includes the '-o -' option, switch to
-    //       using that. (see https://github.com/sandstorm-io/capnproto/pull/190)
-    let cat_file = match ::std::process::Command::new("which").arg("cat").output() {
-        Ok(result) => match result.status.success() {
-		true => result.stdout,
-		false => vec!(b'-'),
-	},
-        Err(_) => vec!(b'-'),
-    };
-
+pub fn compile<P1: ?Sized, P2: ?Sized>(prefix : &P1, files : &[&P2]) -> ::capnp::Result<()>
+    where P1: AsRef<Path>, P2: AsRef<Path>
+{
     let mut command = ::std::process::Command::new("capnp");
-    command.arg("compile").arg("-o").arg(&::std::str::from_utf8(&cat_file).unwrap().trim())
-           .arg(&format!("--src-prefix={}", prefix.display()));
+    command.arg("compile").arg("-o").arg("-")
+           .arg(&format!("--src-prefix={}", prefix.as_ref().display()));
 
-    for file in files.iter() {
-        command.arg(&format!("{}", file.display()));
+    for file in files {
+        command.arg(&format!("{}", file.as_ref().display()));
     }
 
     command.stdout(::std::process::Stdio::piped());
